@@ -5,10 +5,14 @@ Test environment setup.
   > :set nocompatible<CR>
   > :set rtp+=$HOME/.vim/bundle/foldcol<CR>
   > :runtime! plugin/foldcol.vim<CR>
+  > :set rtp+=$HOME/.vim/bundle/Align<CR>
+  > :runtime! plugin/cecutil.vim<CR>
+  > :runtime! plugin/AlignPlugin.vim<CR>
+  > :runtime! plugin/AlignMapsPlugin.vim<CR>
+  > :let b:folds = {}<CR>
 
 
 Test plugin loaded
-  @system
   > :echomsg g:loaded_foldcol<CR>
   ~ v3g
 
@@ -16,7 +20,7 @@ Test plugin loaded
 Try to fold column with default delimeter
   % 111111,222,33333<CR>
   % 1,222,333333333333333<CR>
-  % 1111111111111,2,333<CR>
+  % 1111111111111,2,333
   > :FoldCol 2<CR>
   111111        , 222 , 33333
   1             , 222 , 333333333333333

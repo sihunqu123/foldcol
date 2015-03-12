@@ -120,11 +120,11 @@ function! s:FoldColDelim(col, ...)
   endif
   " Find the left and right of the columns based on delimiter and column
   " number.
-  let l:line = getline('.')
-  let l:num_col = a:col - 1
+  let l:line = getline(1)
+  let l:num_col = a:col
   let l:col_l = 0
-  let l:col_r = stridx(l:line, l:delim)
-  while(l:num_col > 0 && l:col_r > 0)
+  let l:col_r = 0
+  while(l:num_col > 0 && l:col_r >= 0)
     let l:col_l = l:col_r
     let l:col_r = stridx(l:line, l:delim, l:col_l + 1)
     let l:num_col -= 1
@@ -160,7 +160,7 @@ endfunction
 function! s:UnfoldCol(col)
   let l:foldname=s:CreateFoldName(a:col)
   if has_key(b:folds, l:foldname)
-    execute "syn clear ".l:foldname
+    execute "silent! syn clear ".l:foldname
     unlet b:folds[l:foldname]
   endif
 endfunction
