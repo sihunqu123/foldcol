@@ -17,14 +17,14 @@
 " =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 " GetLatestVimScripts: 1161 1 :AutoInstall: foldcol.vim
 
-" ---------------------------------------------------------------------
+" ------------------------------------------------------------------------------
 " Load Once: {{{1
 if &cp || exists("g:loaded_foldcol") || !has("conceal")
  finish
 endif
 let g:loaded_foldcol= "v3g"
 
-" ---------------------------------------------------------------------
+" ------------------------------------------------------------------------------
 " Public Interface: {{{1
 if !hasmapto("<Plug>VFoldCol","v")
  vmap <unique> <Leader>vfc <Plug>VFoldCol
@@ -36,12 +36,18 @@ if !hasmapto("<Plug>NFoldCol","n")
 endif
 nmap <silent> <Plug>NFoldCol    :call <SID>FoldCol(0)<cr>
 
-com!        -range -nargs=0 -bang FoldCol   call s:FoldCol(<bang>1)
-silent! com -range -nargs=0 -bang FC        call s:FoldCol(<bang>1)
+command! -range -nargs=0 -bang VFoldCol call s:FoldCol(<bang>1)
+silent! command -range -nargs=0 -bang FC call s:FoldCol(<bang>1)
 
-" ---------------------------------------------------------------------
+command! -range -nargs=+ -bang FoldCol call s:FoldColDelim(<f-args>)
+command! -nargs=1 UnfoldCol call s:UnfoldCol(<f-args>)
+silent! command -range -nargs=0 -bang FCA call s:UnfoldAll()
+
+autocmd BufEnter * if !exists('b:folds') | let b:folds = {} | endif
+
+" ------------------------------------------------------------------------------
 "  FoldCol: use visual block mode (ctrl-v) to select a block to fold {{{1
-fun! s:FoldCol(dofold)
+function! s:FoldCol(dofold)
 "  call Dfunc("FoldCol(dofold=".a:dofold.")")
 "  call Decho("firstline#".a:firstline." lastline#".a:lastline." <".line("'<")." >".line("'>"))
 
@@ -81,25 +87,90 @@ fun! s:FoldCol(dofold)
   " call Dret("FoldCol")
 endfun
 
-function s:FoldColDelim(delim, col)
-  if strlen(a:delim) != 1
-    echom "Delimiter must be single character."
+function! s:CreateFoldName(col)
+  return "FoldCol" . a:col
+endfunction
+
+" TODO:
+"   Have option to disable doing :Align every time a fold is created.
+"   Write tests for it
+"   See why multi folding not working completely
+
+" ------------------------------------------------------------------------------
+"  FoldColDelim: Fold column 'col' with delimiter 'delim', default ',' {{{1
+function! s:FoldColDelim(col, ...)
+  " Extra Argument1: delim
+  if a:0 > 0
+    let l:delim = a:1
+  else
+    let l:delim = ","
+  endif
+  if strlen(l:delim) != 1
+    echoerr "Delimiter must be single character."
     return
   endif
 
   if &cole == 0
-    let &cole= 1
+    setlocal conceallevel=1
   endif
   " Try align the text first.
   if exists(':Align')
-    exec "Align " . a:delim
+    exec "Align " . l:delim
   endif
   " Find the left and right of the columns based on delimiter and column
   " number.
-  line = getline('.')
+  let l:line = getline('.')
+  let l:num_col = a:col - 1
+  let l:col_l = 0
+  let l:col_r = stridx(l:line, l:delim)
+  while(l:num_col > 0 && l:col_r > 0)
+    let l:col_l = l:col_r
+    let l:col_r = stridx(l:line, l:delim, l:col_l + 1)
+    let l:num_col -= 1
+  endwhile
+  if l:num_col > 0
+    echoerr "Invalid column number ".a:col." with delimiter ".l:delim
+    return
+  endif
   " Match to conceal.
-  exe 'syn region FoldCol start="\%>'.col_l.'v" end="\%>'.col_r.'v" conceal cchar=*'
+  if l:col_l > 0
+    let l:col_l += 1
+  endif
+  let l:foldname=s:CreateFoldName(a:col)
+  try
+    execute "syn clear ".l:foldname
+  catch /E28/
+  endtry
+  if l:col_r < 0
+    if l:col_l == 0
+      echoerr "Incorrect delimiter: " . l:delim
+      return
+    endif
+    exe 'syn region '.l:foldname.' start="\%>'.l:col_l.'v" end="$" conceal cchar=*'
+  else
+    exe 'syn region '.l:foldname.' start="\%>'.l:col_l.'v" end="\%>'.l:col_r.'v" conceal cchar=*'
+  endif
+  let b:folds[l:foldname] = 1
   setlocal concealcursor=nci
+endfunction
+
+" ------------------------------------------------------------------------------
+"  UnfoldCol: Remove fold created for column 'col' {{{1
+function! s:UnfoldCol(col)
+  let l:foldname=s:CreateFoldName(a:col)
+  if has_key(b:folds, l:foldname)
+    execute "syn clear ".l:foldname
+    unlet b:folds[l:foldname]
+  endif
+endfunction
+
+" ------------------------------------------------------------------------------
+"  UnfoldAll: Remove all folds created in the buffer {{{1
+function! s:UnfoldAll()
+  for [key, val] in items(b:folds)
+    execute "syn clear ".key
+    unlet b:folds[key]
+  endfor
 endfunction
 
 " ---------------------------------------------------------------------
