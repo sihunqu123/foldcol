@@ -67,14 +67,40 @@ fun! s:FoldCol(dofold)
     endif
    endif
 
-"  call Decho('syn region FoldCol start="\%>'.line_ul.'l\%>'.col_ul.'v" end="\%>'.line_lr.'l\|\%>'.col_lr.'v" conceal')
-   exe 'syn region FoldCol start="\%>'.line_ul.'l\%>'.col_ul.'v" end="\%>'.line_lr.'l\|\%>'.col_lr.'v" conceal containedin=ALL'
+   " call Decho('syn region FoldCol start="\%>'.line_ul.'l\%>'.col_ul.'v" end="\%>'.line_lr.'l\|\%>'.col_lr.'v" conceal')
+   " With containedin=ALL, every concealed char will be replaced by cchar
+   " without that, the concealed text matched by the syntax will be replaced
+   " by a single cchar
+   " exe 'syn region FoldCol start="\%>'.line_ul.'l\%>'.col_ul.'v" end="\%>'.line_lr.'l\|\%>'.col_lr.'v" conceal containedin=ALL cchar=*'
+   exe 'syn region FoldCol start="\%>'.line_ul.'l\%>'.col_ul.'v" end="\%>'.line_lr.'l\|\%>'.col_lr.'v" conceal cchar=*'
+   setlocal concealcursor=nci
   else
    " remove all folded columns
    syn clear FoldCol
   endif
-"  call Dret("FoldCol")
+  " call Dret("FoldCol")
 endfun
+
+function s:FoldColDelim(delim, col)
+  if strlen(a:delim) != 1
+    echom "Delimiter must be single character."
+    return
+  endif
+
+  if &cole == 0
+    let &cole= 1
+  endif
+  " Try align the text first.
+  if exists(':Align')
+    exec "Align " . a:delim
+  endif
+  " Find the left and right of the columns based on delimiter and column
+  " number.
+  line = getline('.')
+  " Match to conceal.
+  exe 'syn region FoldCol start="\%>'.col_l.'v" end="\%>'.col_r.'v" conceal cchar=*'
+  setlocal concealcursor=nci
+endfunction
 
 " ---------------------------------------------------------------------
 " vim: ts=4 fdm=marker
