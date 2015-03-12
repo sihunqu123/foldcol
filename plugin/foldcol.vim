@@ -87,12 +87,13 @@ function! s:FoldCol(dofold)
   " call Dret("FoldCol")
 endfun
 
+let g:foldcol_align_before_fold=1
+
 function! s:CreateFoldName(col)
   return "FoldCol" . a:col
 endfunction
 
 " TODO:
-"   Have option to disable doing :Align every time a fold is created.
 "   Write tests for it
 "   See why multi folding not working completely
 
@@ -114,7 +115,7 @@ function! s:FoldColDelim(col, ...)
     setlocal conceallevel=1
   endif
   " Try align the text first.
-  if exists(':Align')
+  if exists(':Align') && g:foldcol_align_before_fold == 1
     exec "Align " . l:delim
   endif
   " Find the left and right of the columns based on delimiter and column
