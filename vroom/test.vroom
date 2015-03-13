@@ -26,7 +26,7 @@ Check dependencies and setup.
 
 Test plugin loaded.
   > :echomsg g:loaded_foldcol<CR>
-  ~ v3g
+  ~ 1
 
 
 Try to fold column with default delimiter.
