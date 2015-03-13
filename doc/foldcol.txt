@@ -1,9 +1,38 @@
-*foldcol.txt*
-                                                                     *foldcol*
+*foldcol.txt*	Utility to fold columns when editing files with many columns
+paulhybryant                                                         *foldcol*
 
 ==============================================================================
 CONTENTS                                                    *foldcol-contents*
-  1. Functions.............................................|foldcol-functions|
+  1. Configuration............................................|foldcol-config|
+  2. Commands...............................................|foldcol-commands|
+  3. Functions.............................................|foldcol-functions|
+
+==============================================================================
+CONFIGURATION                                                 *foldcol-config*
+
+                                                 *g:foldcol_align_before_fold*
+[foldcol_align_before_fold] is 1 if omitted.
+Whether to align the text before folding the columns.
+
+==============================================================================
+COMMANDS                                                    *foldcol-commands*
+
+:VFoldClear                                                      *:VFoldClear*
+  Remove all folds created in visual mode.
+
+:FoldCol                                                            *:FoldCol*
+
+:[range]FoldCol[!] {col_num} [delim]
+  [delim] is ',' if omitted.
+  Fold column 'col_num' separated by delimiter 'delim'.
+
+:UnfoldCol                                                        *:UnfoldCol*
+
+:UnfoldCol {col_num}
+  Unfold column 'col_num'.
+
+:UnfoldAll                                                        *:UnfoldAll*
+  Unfold all folded columns.
 
 ==============================================================================
 FUNCTIONS                                                  *foldcol-functions*

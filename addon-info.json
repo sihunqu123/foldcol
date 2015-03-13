@@ -1,0 +1,7 @@
+{
+  "name": "foldcol",
+  "description": "Utility to fold columns when editing files with many columns",
+  "version": "1.0",
+  "author": "paulhybryant",
+  "repository": {"type": "git", "url": "git://github.com/paulhybryant/foldcol"}
+}
