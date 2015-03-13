@@ -25,3 +25,6 @@ Try to fold column with default delimeter
   111111        , 222 , 33333
   1             , 222 , 333333333333333
   1111111111111 , 2   , 333
+  > :let b:syngroup = foldcol#GetSynGroup("FoldCol2")<CR>
+  > :echomsg b:syngroup<CR>
+  ~ FoldCol2       xxx match /\%16c...../  conceal 

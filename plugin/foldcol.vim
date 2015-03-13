@@ -147,9 +147,13 @@ function! s:FoldColDelim(col, ...)
       echoerr "Incorrect delimiter: " . l:delim
       return
     endif
-    exe 'syn region '.l:foldname.' start="\%>'.l:col_l.'v" end="$" conceal cchar=*'
+    " exe 'syn region '.l:foldname.' start="\%>'.l:col_l.'v" end="$" conceal cchar=*'
+    let l:col_l += 1
+    exe 'syn match '.l:foldname.' "\%'.l:col_l.'c.*$" conceal cchar=*'
   else
-    exe 'syn region '.l:foldname.' start="\%>'.l:col_l.'v" end="\%>'.l:col_r.'v" conceal cchar=*'
+    " exe 'syn region '.l:foldname.' start="\%>'.l:col_l.'v" end="\%>'.l:col_r.'v" conceal cchar=*'
+    let l:col_l += 1
+    exe 'syn match '.l:foldname.' "\%'.l:col_l.'c'.repeat(".", l:col_r - l:col_l + 1).'" conceal cchar=*'
   endif
   let b:folds[l:foldname] = 1
   setlocal concealcursor=nci
