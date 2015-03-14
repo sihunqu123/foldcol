@@ -39,3 +39,11 @@ Try to fold column with default delimiter.
   > :let b:syngroup = myutils#GetSynGroup("FoldCol2")<CR>
   > :echomsg b:syngroup<CR>
   ~ FoldCol2       xxx match /\%16c...../  conceal
+
+Error cases
+  > :call foldcol#FoldColDelim(2, ",|")<CR>
+  ~ Delimiter must be single character.
+  > :call foldcol#FoldColDelim(2, "|")<CR>
+  ~ Invalid column number 2 with delimiter '|'
+  > :call foldcol#FoldColDelim(1, "|")<CR>
+  ~ Invalid delimiter '|'

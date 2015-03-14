@@ -18,10 +18,7 @@ let s:plugin = maktaba#plugin#Get('foldcol')
 " @public
 " Use visual block mode to select a block to fold.
 function! foldcol#FoldCol() " {{{
-  " make a new fold
-  if &cole == 0
-    let &cole= 1
-  endif
+  call s:ToggleConcealIfNotSet()
 
   " upper left corner
   let line_ul = line("'<") - 1
@@ -57,35 +54,28 @@ endfunction
 " }}}
 
 ""
-" @private
-" Create fold name for column {col}.
-function! foldcol#CreateFoldName(col) " {{{
-  return "FoldCol" . a:col
-endfunction
-" }}}
-
-""
 " @public
 " Fold column {col} with delimiter [delim]. Align the text before folding the
 " columns if @flag(align) is set.
 function! foldcol#FoldColDelim(col, ...) " {{{
+  call s:ToggleConcealIfNotSet()
+
+  " Check delimiter
   if a:0 > 0
     let l:delim = a:1
   else
     let l:delim = ","
   endif
   if strlen(l:delim) != 1
-    echoerr "Delimiter must be single character."
+    call maktaba#error#Shout("Delimiter must be single character.")
     return
   endif
 
-  if &cole == 0
-    setlocal conceallevel=1
-  endif
   " Try align the text first.
   if exists(':Align') && s:plugin.Flag('align') == 1
     exec "Align " . l:delim
   endif
+
   " Find the left and right of the columns based on delimiter and column
   " number.
   let l:line = getline(1)
@@ -98,28 +88,27 @@ function! foldcol#FoldColDelim(col, ...) " {{{
     let l:num_col -= 1
   endwhile
   if l:num_col > 0
-    echoerr "Invalid column number ".a:col." with delimiter ".l:delim
+    call maktaba#error#Shout("Invalid column number ".a:col." with delimiter '".l:delim."'")
     return
   endif
+
   " Match to conceal.
-  if l:col_l > 0
-    let l:col_l += 1
-  endif
-  let l:foldname=foldcol#CreateFoldName(a:col)
+  let l:foldname = s:CreateFoldName(a:col)
   try
     execute "syn clear ".l:foldname
   catch /E28/
   endtry
+  if l:col_l > 0
+    let l:col_l += 1
+  endif
   if l:col_r < 0
     if l:col_l == 0
-      echoerr "Incorrect delimiter: " . l:delim
+      call maktaba#error#Shout("Invalid delimiter '" . l:delim . "'")
       return
     endif
-    " exe 'syn region '.l:foldname.' start="\%>'.l:col_l.'v" end="$" conceal cchar=*'
     let l:col_l += 1
     exe 'syn match '.l:foldname.' "\%'.l:col_l.'c.*$" conceal cchar=*'
   else
-    " exe 'syn region '.l:foldname.' start="\%>'.l:col_l.'v" end="\%>'.l:col_r.'v" conceal cchar=*'
     let l:col_l += 1
     exe 'syn match '.l:foldname.' "\%'.l:col_l.'c'.repeat(".", l:col_r - l:col_l + 1).'" conceal cchar=*'
   endif
@@ -132,7 +121,7 @@ endfunction
 " @public
 " Remove fold created for column {col}.
 function! foldcol#UnfoldCol(col) " {{{
-  let l:foldname=foldcol#CreateFoldName(a:col)
+  let l:foldname = s:CreateFoldName(a:col)
   if has_key(b:folds, l:foldname)
     execute "silent! syn clear ".l:foldname
     unlet b:folds[l:foldname]
@@ -144,10 +133,31 @@ endfunction
 " @public
 " Remove all folds created in the buffer.
 function! foldcol#UnfoldAll() " {{{
+  if !exists('b:folds')
+    let b:folds = {}
+  endif
   for [key, val] in items(b:folds)
     execute "syn clear ".key
     unlet b:folds[key]
   endfor
+endfunction
+" }}}
+
+""
+" @private
+" Create fold name for column {col}.
+function! s:CreateFoldName(col) " {{{
+  return "FoldCol" . a:col
+endfunction
+" }}}
+
+""
+" @private
+" Toggle conceallevel if not set
+function! s:ToggleConcealIfNotSet() " {{{
+  if &conceallevel == 0
+    setlocal conceallevel=1
+  endif
 endfunction
 " }}}
 
