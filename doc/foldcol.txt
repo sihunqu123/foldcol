@@ -10,12 +10,35 @@ CONTENTS                                                    *foldcol-contents*
 ==============================================================================
 CONFIGURATION                                                 *foldcol-config*
 
-                                                 *g:foldcol_align_before_fold*
-[foldcol_align_before_fold] is 1 if omitted.
+This plugin uses maktaba flags for configuration. Install Glaive
+(https://github.com/google/glaive) and use the |:Glaive| command to configure
+them.
+
+                                                               *foldcol:align*
 Whether to align the text before folding the columns.
+Default: 1 `
+
+                                                    *foldcol:plugin[autocmds]*
+Configures whether plugin/autocmds.vim should be loaded.
+Default: 1 `
+
+                                                    *foldcol:plugin[commands]*
+Configures whether plugin/commands.vim should be loaded.
+Default: 1 `
+
+                                                    *foldcol:plugin[mappings]*
+Configures whether plugin/mappings.vim should be loaded.
+Default: 0 `
+
+                                                      *foldcol:plugin[plugin]*
+Configures whether plugin/plugin.vim should be loaded.
+Default: 1 `
 
 ==============================================================================
 COMMANDS                                                    *foldcol-commands*
+
+:VFoldCol                                                          *:VFoldCol*
+  Fold the selected columns in visual mode.
 
 :VFoldClear                                                      *:VFoldClear*
   Remove all folds created in visual mode.
@@ -24,12 +47,12 @@ COMMANDS                                                    *foldcol-commands*
 
 :[range]FoldCol[!] {col_num} [delim]
   [delim] is ',' if omitted.
-  Fold column 'col_num' separated by delimiter 'delim'.
+  Fold column {col_num} separated by delimiter [delim].
 
 :UnfoldCol                                                        *:UnfoldCol*
 
 :UnfoldCol {col_num}
-  Unfold column 'col_num'.
+  Unfold column {col_num}.
 
 :UnfoldAll                                                        *:UnfoldAll*
   Unfold all folded columns.
@@ -38,16 +61,17 @@ COMMANDS                                                    *foldcol-commands*
 FUNCTIONS                                                  *foldcol-functions*
 
 foldcol#FoldCol()                                          *foldcol#FoldCol()*
-  Use visual block mode (ctrl-v) to select a block to fold.
+  Use visual block mode to select a block to fold.
 
 foldcol#FoldClear()                                      *foldcol#FoldClear()*
   Clear fold created in visual mode.
 
-foldcol#FoldColDelim({col})                           *foldcol#FoldColDelim()*
-  Fold column 'col' with delimiter 'delim', default ','.
+foldcol#FoldColDelim({col}, [delim])                  *foldcol#FoldColDelim()*
+  Fold column {col} with delimiter [delim]. Align the text before folding the
+  columns if |foldcol:align| is set.
 
 foldcol#UnfoldCol({col})                                 *foldcol#UnfoldCol()*
-  Remove fold created for column 'col'.
+  Remove fold created for column {col}.
 
 foldcol#UnfoldAll()                                      *foldcol#UnfoldAll()*
   Remove all folds created in the buffer.

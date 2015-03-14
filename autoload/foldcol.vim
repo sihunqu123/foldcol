@@ -1,6 +1,22 @@
+" Copyright 2015 Yu Huang. All rights reserved.
+"
+" Licensed under the Apache License, Version 2.0 (the "License");
+" you may not use this file except in compliance with the License.
+" You may obtain a copy of the License at
+"
+"     http://www.apache.org/licenses/LICENSE-2.0
+"
+" Unless required by applicable law or agreed to in writing, software
+" distributed under the License is distributed on an "AS IS" BASIS,
+" WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+" See the License for the specific language governing permissions and
+" limitations under the License.
+
+let s:plugin = maktaba#plugin#Get('foldcol')
+
 ""
 " @public
-" Use visual block mode (ctrl-v) to select a block to fold.
+" Use visual block mode to select a block to fold.
 function! foldcol#FoldCol() " {{{
   " make a new fold
   if &cole == 0
@@ -42,7 +58,7 @@ endfunction
 
 ""
 " @private
-" Create fold name for column 'col'.
+" Create fold name for column {col}.
 function! foldcol#CreateFoldName(col) " {{{
   return "FoldCol" . a:col
 endfunction
@@ -50,9 +66,9 @@ endfunction
 
 ""
 " @public
-" Fold column 'col' with delimiter 'delim', default ','.
+" Fold column {col} with delimiter [delim]. Align the text before folding the
+" columns if @flag(align) is set.
 function! foldcol#FoldColDelim(col, ...) " {{{
-  " Extra Argument1: delim
   if a:0 > 0
     let l:delim = a:1
   else
@@ -67,7 +83,7 @@ function! foldcol#FoldColDelim(col, ...) " {{{
     setlocal conceallevel=1
   endif
   " Try align the text first.
-  if exists(':Align') && g:foldcol_align_before_fold == 1
+  if exists(':Align') && s:plugin.Flag('align') == 1
     exec "Align " . l:delim
   endif
   " Find the left and right of the columns based on delimiter and column
@@ -114,7 +130,7 @@ endfunction
 
 ""
 " @public
-" Remove fold created for column 'col'.
+" Remove fold created for column {col}.
 function! foldcol#UnfoldCol(col) " {{{
   let l:foldname=foldcol#CreateFoldName(a:col)
   if has_key(b:folds, l:foldname)

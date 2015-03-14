@@ -18,22 +18,21 @@ Check dependencies and setup.
   ~ 1
   > :set rtp+=$HOME/.vim/bundle/vim-maktaba<CR>
   > :source $HOME/.vim/bundle/vim-maktaba/bootstrap.vim<CR>
+  > :echomsg isdirectory(expand("$HOME/.vim/bundle/vim-glaive"))<CR>
+  ~ 1
+  > :set rtp+=$HOME/.vim/bundle/vim-glaive<CR>
+  > :source $HOME/.vim/bundle/vim-glaive/bootstrap.vim<CR>
   > :echomsg isdirectory(expand("$HOME/.vim/bundle/vim-custom"))<CR>
   ~ 1
   > :set rtp+=$HOME/.vim/bundle/vim-custom<CR>
   > :let b:folds = {}<CR>
 
 
-Test plugin loaded.
-  > :echomsg g:loaded_foldcol<CR>
-  ~ 1
-
-
 Try to fold column with default delimiter.
   % 111111,222,33333<CR>
   % 1,222,333333333333333<CR>
   % 1111111111111,2,333
-  > :FoldCol 2<CR>
+  > :call foldcol#FoldColDelim(2)<CR>
   111111        , 222 , 33333
   1             , 222 , 333333333333333
   1111111111111 , 2   , 333
